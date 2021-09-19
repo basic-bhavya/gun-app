@@ -11,22 +11,18 @@ const Home: NextPage = () => {
     countRef.on(
       (countVal) => {
         setCounter(countVal.val);
-        console.log(countVal.val);
       },
       true
-      // <h2>{countVal}</h2>
     );
   }, []);
 
   return (
     <div>
-      {/* {count.get("val")} */}
       <button
         onClick={() => {
           countRef.put({
             val: counter - 1,
           });
-          // setCounter(counter + 1);
         }}
       >
         -1
