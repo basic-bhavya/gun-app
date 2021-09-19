@@ -2,18 +2,17 @@ import type { NextPage } from "next";
 import Gun from "gun";
 import { useEffect, useState } from "react";
 
-const countRef = Gun(['localhost:3000', 'gun-app.vercel.app/']).get("gun-chat");
+const countRef = Gun({ peers: ["localhost:3000", "gun-app.vercel.app/"] }).get(
+  "gun-chat"
+);
 
 const Home: NextPage = () => {
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {
-    countRef.on(
-      (countVal) => {
-        setCounter(countVal.val);
-      },
-      true
-    );
+    countRef.on((countVal) => {
+      setCounter(countVal.val);
+    }, true);
   }, []);
 
   return (
