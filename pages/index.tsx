@@ -2,9 +2,11 @@ import type { NextPage } from "next";
 import Gun from "gun";
 import { useEffect, useState } from "react";
 
-const countRef = Gun({ peers: ["localhost:3000/gun", "gun-manhattan.herokuapp.com/gun"] }).get(
-  "gun-chat"
-);
+const countRef = Gun([
+  "localhost:3000",
+  "gun-app.vercel.app",
+  "http://gun-manhattan.herokuapp.com/gun",
+]).get("gun-chat");
 
 const Home: NextPage = () => {
   const [counter, setCounter] = useState(0);
@@ -12,16 +14,19 @@ const Home: NextPage = () => {
   useEffect(() => {
     countRef.on((countVal) => {
       setCounter(countVal.val);
-    }, true);
+      console.log(countVal.val);
+    });
   }, []);
 
   return (
     <div>
+      {/* {count.get("val")} */}
       <button
         onClick={() => {
           countRef.put({
             val: counter - 1,
           });
+          // setCounter(counter + 1);
         }}
       >
         -1
@@ -32,6 +37,7 @@ const Home: NextPage = () => {
           countRef.put({
             val: counter + 1,
           });
+          // setCounter(counter + 1);
         }}
       >
         +1
