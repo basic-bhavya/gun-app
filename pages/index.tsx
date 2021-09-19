@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Gun from "gun";
 import { useEffect, useState } from "react";
 
-const countRef = Gun().get("gun-counter-app");
+const countRef = Gun(['localhost:3000', 'http://gun-manhattan.herokuapp.com/gun']).get("gun-chat");
 
 const Home: NextPage = () => {
   const [counter, setCounter] = useState(0);
