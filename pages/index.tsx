@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const countRef = Gun([
   "localhost:3000",
-  "gun-app.vercel.app",
+  "https://gun-app.vercel.app",
   "http://gun-manhattan.herokuapp.com/gun",
 ]).get("gun-chat");
 
