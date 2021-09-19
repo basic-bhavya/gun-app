@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Gun from "gun";
 import { useEffect, useState } from "react";
 
-const countRef = Gun({ peers: ["localhost:3000", "gun-app.vercel.app/"] }).get(
+const countRef = Gun({ peers: ["localhost:3000/gun", "gun-manhattan.herokuapp.com/gun"] }).get(
   "gun-chat"
 );
 
