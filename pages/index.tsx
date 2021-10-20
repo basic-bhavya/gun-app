@@ -9,21 +9,21 @@ const gun = Gun([
   "http://gun-manhattan.herokuapp.com/gun",
 ]);
 
-const todoRef = gun.get("gun-chat");
+const chatRef = gun.get("gun-chat");
 
 const Home: NextPage = () => {
   const [counter, setCounter] = useState(0);
   const [currentTodo, setCurrentTodo] = useState("");
   const [allTodos, setAllTodos] = useState<string[]>([]);
   useEffect(() => {
-    todoRef.get("counter").on((countVal) => {
+    chatRef.get("counter").on((countVal) => {
       setCounter(countVal.val);
     });
 
     // todoRef.get("todos").on(() => {
     let newTodos: string[] = [];
     console.group("Todos");
-    todoRef
+    chatRef
       .get("todos")
       .map()
       .map((todo) => {
@@ -31,9 +31,8 @@ const Home: NextPage = () => {
       });
     console.groupEnd();
     setAllTodos(newTodos);
-    // });
 
-    todoRef.get("todos").on((todos) => {
+    chatRef.get("todos").on((todos) => {
       console.log(todos);
     });
 
@@ -50,7 +49,7 @@ const Home: NextPage = () => {
       {/* {count.get("val")} */}
       <button
         onClick={() => {
-          todoRef.get("counter").put({
+          chatRef.get("counter").put({
             val: counter - 1,
           });
           // setCounter(counter + 1);
@@ -61,7 +60,7 @@ const Home: NextPage = () => {
       {counter}
       <button
         onClick={() => {
-          todoRef.get("counter").put({
+          chatRef.get("counter").put({
             val: counter + 1,
           });
           // setCounter(counter + 1);
@@ -80,13 +79,13 @@ const Home: NextPage = () => {
         />
         <button
           onClick={() => {
-            const todos = todoRef.get("todos");
+            const todos = chatRef.get("todos");
             todos.set({
               val: currentTodo,
             });
 
             console.group("todos Add");
-            todoRef.get("todos").map((todo) => {
+            chatRef.get("todos").map((todo) => {
               console.log(todo.val);
             });
             console.groupEnd();
@@ -98,7 +97,7 @@ const Home: NextPage = () => {
           onClick={() => {
             // console.log("clicked");
             console.group("todos");
-            todoRef.get("todos").map((todo) => {
+            chatRef.get("todos").map((todo) => {
               console.log(todo.val);
             });
             console.groupEnd();
@@ -109,10 +108,10 @@ const Home: NextPage = () => {
         <button
           onClick={() => {
             // delete all todos
-            todoRef.get("todos").put({});
+            chatRef.get("todos").put({});
             // print all todos
             console.group("todos");
-            todoRef.get("todos").map((todo) => {
+            chatRef.get("todos").map((todo) => {
               console.log(todo.val);
             });
             // todoRef.get("todos").map().unset();
@@ -129,7 +128,7 @@ const Home: NextPage = () => {
               onClick={
                 // delete todo
                 () => {
-                  todoRef.get("todos").map((gun_todo) => {
+                  chatRef.get("todos").map((gun_todo) => {
                     // console.log(todo.val);
                     if (gun_todo.val === todo) {
                       // console.log("deleting",gun_todo);
