@@ -1,24 +1,33 @@
-import { IGunStaticSEA } from "gun/types/static/sea";
-import { useState } from "react";
-// import { user } from "../backend/user";
-// import { getSetUsername } from "../backend/user";
+import GUN from "gun/gun";
+import "gun/sea";
+import "gun/axe";
+import { IGunChainReference } from "gun/types/chain";
+import { FunctionComponent, useEffect, useState } from "react";
+import { delBasePath } from "next/dist/shared/lib/router/router";
 
-const Login = (props: { setUsername: Function, user:any }) => {
-  const [username, setUsername] = useState("");
+interface Props {
+  gun: IGunChainReference;
+  user: any;
+  loggedin: boolean;
+  setLoggedin: Function;
+  setUsername: Function;
+}
+
+const Login: FunctionComponent<Props> = (props) => {
+  const { gun, user, loggedin, setLoggedin, setUsername } = props;
+
+  const [usernamefield, setUsernameField] = useState("");
   const [password, setPassword] = useState("");
 
-  const login = () => {
-    props.user
-      .auth(username, password, ({ err }) => err && alert(err))
-      .on(async (v) => {
-        const alias = await props.user.get("alias");
-        console.log(alias);
-        props.setUsername(alias);
-      });
-  };
+  useEffect(() => {
+    user.get("alias").on((v:string) => setUsername(v));
+    return () => {
+      user.get("alias").off();
+    };
+  }, []);
 
   const signup = () => {
-    user.create(username, password, ({ err }) => {
+    user.create(usernamefield, password, ({ err }) => {
       if (err) {
         alert(err);
       } else {
@@ -27,16 +36,28 @@ const Login = (props: { setUsername: Function, user:any }) => {
     });
   };
 
+  const login = () => {
+    user.auth(usernamefield, password, async (res: any) => {
+      if (res.err) {
+        alert(res.err);
+      } else {
+        setLoggedin(true);
+        const alias = await user.get("alias");
+        setUsername(alias);
+      }
+    });
+  };
+
   return (
     <div>
       <input
-        type="text"
         placeholder="username"
-        onChange={(e) => setUsername(e.target.value)}
+        value={usernamefield}
+        onChange={(e) => setUsernameField(e.target.value)}
       />
       <input
-        type="password"
         placeholder="password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
       <button onClick={login}>Login</button>
