@@ -25,7 +25,8 @@ const Login: FunctionComponent<Props> = (props) => {
   }, []);
 
   const signup = () => {
-    user.create(usernamefield, password, ({ err }) => {
+    user.create(usernamefield, password, (props:any) => {
+      const { err } = props;
       if (err) {
         alert(err);
       } else {
