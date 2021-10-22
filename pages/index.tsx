@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Gun, { SEA } from "gun";
-require("gun/lib/unset");
 import { useEffect, useState } from "react";
 import Login from "../components/Login";
 
