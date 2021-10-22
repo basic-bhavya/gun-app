@@ -3,8 +3,6 @@ import "gun/sea";
 import "gun/axe";
 import { IGunChainReference } from "gun/types/chain";
 import { FunctionComponent, useEffect, useState } from "react";
-import { delBasePath } from "next/dist/shared/lib/router/router";
-
 interface Props {
   gun: IGunChainReference;
   user: any;

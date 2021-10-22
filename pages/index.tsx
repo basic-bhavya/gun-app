@@ -1,10 +1,11 @@
 import type { NextPage } from "next";
-import Gun from "gun";
+import Gun, { SEA } from "gun";
 require("gun/lib/unset");
 import { useEffect, useState } from "react";
 import Login from "../components/Login";
 
-const gun = Gun(["localhost:3000/gun", "gun-app.vercel.app/gun"]);
+// const gun = Gun(["localhost:3000/gun", "gun-app.vercel.app/gun"]);
+const gun = Gun();
 
 type TGunMessage = {
   who: string;
@@ -17,26 +18,32 @@ const appRef = gun.get("gun-chat");
 const Home: NextPage = () => {
   const user = gun.user().recall({ sessionStorage: true });
 
-  const [chatWhat, setChatWhat] = useState<string>();
+  const [newMessage, setNewMessage] = useState<string>();
   const [chatWho, setChatWho] = useState<string>();
   const [loggedin, setLoggedin] = useState(false);
   const [allMessages, setAllMessages] = useState<TGunMessage[]>([]);
   const [username, setUsername] = useState("");
 
-  const sendMessage = () => {
-    const message = user.get("all").set({ what: chatWhat });
+  const sendMessage = async () => {
+    const secret = await SEA.encrypt(newMessage, "#encryptionkey");
+    const message = user.get("all").set({ what: secret });
     const index = Date.now();
-    gun.get("gun-chat").get(index).put(message);
+    appRef.get("IWS").get(index).put(message);
+    console.log("sent", message);
   };
 
   useEffect(() => {
     let timestamps: string[] = [];
+
+    user.get("alias").on((v: string) => setUsername(v));
+
     // console.log(parseFloat("hello"));
     appRef
-      .get("chat")
+      .get("chats")
       .get("IWS")
       .on((chat) => {
-        timestamps.push(...Object.keys(chat).filter((key) => !!parseInt(key)));
+        console.log("my chat",chat);
+        // timestamps.push(...Object.keys(chat).filter((key) => !!parseInt(key)));
       });
 
     // console.log(timestamps[0]);
@@ -45,8 +52,27 @@ const Home: NextPage = () => {
     appRef
       .get("chat")
       .get("IWS")
-      .get("1634794336307")
-      .once((data) => console.log(data));
+      .once(async (data, id) => {
+        if (data) {
+          const key = "#encryptionkey";
+          console.log("my data is", data);
+          let message = {
+            who: data.who,
+            what: (await SEA.decrypt(data.what, key)) + "",
+            when: data.when,
+          };
+
+          if (message.what) {
+            setAllMessages((allMessages) =>
+              [...allMessages.slice(-100), message].sort(
+                (a, b) => a.when - b.when
+              )
+            );
+          }
+
+          console.log(allMessages);
+        }
+      });
     // );
 
     // timestamps.forEach((timestamp) => {
@@ -74,7 +100,7 @@ const Home: NextPage = () => {
           <input
             type="text"
             placeholder="Message"
-            onChange={(e) => setChatWhat(e.target.value)}
+            onChange={(e) => setNewMessage(e.target.value)}
           />
           <button
             onClick={
