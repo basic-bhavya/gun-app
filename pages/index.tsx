@@ -16,6 +16,7 @@ const appRef = gun.get("gun-chat");
 
 const Home: NextPage = () => {
   const user = gun.user().recall({ sessionStorage: true });
+  let userkey = "";
 
   const [newMessage, setNewMessage] = useState<string>();
   const [chatWho, setChatWho] = useState<string>();
@@ -34,14 +35,25 @@ const Home: NextPage = () => {
   useEffect(() => {
     let timestamps: string[] = [];
 
-    user.get("alias").on((v: string) => setUsername(v));
+    gun.on("auth", async (event) => {
+      const alias = await user.get("alias");
+      setLoggedin(true);
+      setUsername(alias);
+      gun.get(`~@${alias}`).once((data, key) => {
+        // userkey = Object.keys(data)[1];
+        // console.log(data);
+      });
+      
+      appRef.get(`${alias}`).get("profile").once(console.log);
+      // console.log(`signed in as ${alias}`);
+    });
 
     // console.log(parseFloat("hello"));
     appRef
       .get("chats")
       .get("IWS")
       .on((chat) => {
-        console.log("my chat",chat);
+        console.log("my chat", chat);
         // timestamps.push(...Object.keys(chat).filter((key) => !!parseInt(key)));
       });
 
@@ -54,7 +66,7 @@ const Home: NextPage = () => {
       .once(async (data, id) => {
         if (data) {
           const key = "#encryptionkey";
-          console.log("my data is", data);
+          // console.log("my data is", data);
           let message = {
             who: data.who,
             what: (await SEA.decrypt(data.what, key)) + "",

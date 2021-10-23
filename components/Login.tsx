@@ -17,34 +17,29 @@ const Login: FunctionComponent<Props> = (props) => {
   const [usernamefield, setUsernameField] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    user.get("alias").on((v:string) => setUsername(v));
-    return () => {
-      user.get("alias").off();
-    };
-  }, []);
-
   const signup = () => {
-    user.create(usernamefield, password, (props:any) => {
+    user.create(usernamefield, password, (props: any) => {
       const { err } = props;
       if (err) {
         alert(err);
       } else {
+        console.log("Usernamefield", usernamefield);
+        gun
+          .get("gun-chat")
+          .get(`${usernamefield}`)
+          .get("profile")
+          .put({ name: usernamefield, subject: "IWS", professor: "DSharma" });
         login();
       }
     });
   };
 
   const login = () => {
-    user.auth(usernamefield, password, async (res: any) => {
-      if (res.err) {
-        alert(res.err);
-      } else {
-        setLoggedin(true);
-        const alias = await user.get("alias");
-        setUsername(alias);
-      }
-    });
+    user.auth(
+      usernamefield,
+      password,
+      (props: any) => props.err && alert(props.err)
+    );
   };
 
   return (
